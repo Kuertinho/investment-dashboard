@@ -203,10 +203,10 @@ Use the no-hypothesis weighting formula.`
   try {
     const response = await client.messages.create({
       model: SCORECARD_MODEL,
-      max_tokens: 16000,
-      tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+      max_tokens: 8000,
+      tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 8 }],
       system: `You are a senior buy-side equity research analyst with a Buffett/Munger quality-first lens.
-Use web search extensively to gather current financial data, analyst consensus, and market signals.
+Use web search efficiently — batch related queries, use at most 8 searches total.
 Return ONLY valid JSON — no markdown, no text outside the JSON object.
 If data is unavailable mark it "N/A" and explain gaps in the written verdict.
 If web search returns conflicting data, use the most recent and mark it "estimated".`,
@@ -224,141 +224,144 @@ Return ONLY a valid JSON object with this exact structure:
 
   "quality": {
     "quantitative": {
-      "grossMargin": { "value": "45.2%", "trend": "expanding|stable|contracting" },
-      "operatingMargin": { "value": "18.3%", "vsSectorAvg": "+5.2pp or N/A" },
-      "roic": { "value": "22.5%", "flagHigh": true },
-      "revenueGrowthConsistency": "assessment string",
-      "fcfConversion": "89% or N/A"
+      "grossMargin": { "value": "string", "trend": "expanding|stable|contracting" },
+      "operatingMargin": { "value": "string", "vsSectorAvg": "string" },
+      "roic": { "value": "string", "flagHigh": true },
+      "revenueGrowthConsistency": "string",
+      "fcfConversion": "string"
     },
     "qualitative": {
-      "proprietaryKnowHow": "assessment string",
-      "brandAndPricingPower": "assessment string",
-      "managementQuality": "assessment string",
+      "proprietaryKnowHow": "string",
+      "brandAndPricingPower": "string",
+      "managementQuality": "string",
       "moatType": "network_effect|switching_costs|cost_advantage|intangible_assets|none",
       "moatStrength": "weak|moderate|strong",
       "customerConcentrationRisk": "low|medium|high"
     },
     "quantScore": 8,
     "qualScore": 7,
-    "verdict": "3-4 sentence synthesis"
+    "verdict": "string"
   },
 
   "businessEconomics": {
     "capitalAllocation": {
       "shareBuybackHistory": { "assessment": "string", "accretive": true },
       "maTrackRecord": { "assessment": "string", "valueCreating": true },
-      "dividendConsistency": "assessment string",
+      "dividendConsistency": "string",
       "reinvestmentRateVsROIC": { "assessment": "string", "compoundingMachine": false }
     },
     "earningsQuality": {
-      "accrualsRatio": "assessment string",
-      "earningsRevisionHistory": "assessment string",
+      "accrualsRatio": "string",
+      "earningsRevisionHistory": "string",
       "revenueVisibility": "recurring|mixed|transactional",
       "cyclicality": "low|moderate|high"
     },
     "reinvestmentRunway": {
-      "tamVsCurrentMarketShare": "assessment string",
-      "organicGrowthPotential": "assessment string",
+      "tamVsCurrentMarketShare": "string",
+      "organicGrowthPotential": "string",
       "internationalExpansionPotential": "low|moderate|high"
     },
     "ownerOrientation": {
-      "insiderOwnershipPct": { "value": "12.3%", "flagHigh": true },
-      "compensationStructure": "assessment string",
+      "insiderOwnershipPct": { "value": "string", "flagHigh": true },
+      "compensationStructure": "string",
       "founderLed": true,
       "shareholderCommunicationQuality": "poor|adequate|excellent"
     },
     "businessEconomicsScore": 8,
-    "verdict": "3-4 sentence synthesis"
+    "verdict": "string"
   },
 
   "solvency": {
-    "netDebtToEbitda": { "value": "1.2x", "flagHigh": false },
-    "interestCoverage": { "value": "18.5x", "flagLow": false },
-    "currentRatio": "2.1x",
+    "netDebtToEbitda": { "value": "string", "flagHigh": false },
+    "interestCoverage": { "value": "string", "flagLow": false },
+    "currentRatio": "string",
     "nearTermRefinancingRisk": "low|medium|high",
-    "fcfVsDebtObligations": "assessment string",
+    "fcfVsDebtObligations": "string",
     "solvencyScore": 9,
-    "verdict": "3-4 sentence synthesis"
+    "verdict": "string"
   },
 
   "value": {
     "multiples": {
-      "trailingPE": { "value": "22.5x", "vs5yrAvg": "-15% or N/A" },
-      "forwardPE": { "value": "18.0x" },
-      "evToEbitda": { "value": "12.1x", "vsSectorMedian": "-8% or N/A" },
-      "priceToSales": "4.2x",
-      "priceToFCF": "19.5x",
-      "peerValuationPremiumDiscount": { "pct": "-12%", "justification": "string" },
-      "marketPremiumDiscount": "vs S&P 500 forward P/E: -5% or N/A"
+      "trailingPE": { "value": "string", "vs5yrAvg": "string" },
+      "forwardPE": { "value": "string" },
+      "evToEbitda": { "value": "string", "vsSectorMedian": "string" },
+      "priceToSales": "string",
+      "priceToFCF": "string",
+      "peerValuationPremiumDiscount": { "pct": "string", "justification": "string" },
+      "marketPremiumDiscount": "string"
     },
     "marketSignals": {
-      "week52Position": { "fromLow": "+45%", "fromHigh": "-8%" },
-      "priceVs200ma": { "position": "above|below", "pctDistance": "+12%" },
-      "relativeStrength6M": "+8% vs sector or N/A",
-      "relativeStrength12M": "+22% vs sector or N/A"
+      "week52Position": { "fromLow": "string", "fromHigh": "string" },
+      "priceVs200ma": { "position": "above|below", "pctDistance": "string" },
+      "relativeStrength6M": "string",
+      "relativeStrength12M": "string"
     },
     "downside": {
-      "bearCaseScenario": "2-3 sentence description",
-      "assetBacking": "assessment string",
-      "historicalDrawdownBehavior": "assessment string",
+      "bearCaseScenario": "string",
+      "assetBacking": "string",
+      "historicalDrawdownBehavior": "string",
       "marginOfSafetyAssessment": "none|thin|adequate|comfortable"
     },
     "valueScore": 7,
-    "verdict": "3-4 sentence synthesis"
+    "verdict": "string"
   },
 
   "hypothesisFit": {
     "included": false,
     "hypothesisHeadline": null,
-    "fitAssessment": "N/A",
-    "revenueExposure": { "pct": "N/A", "reasoning": "N/A" },
-    "tailwindStrength": "weak",
-    "competitivePositionWithinThesis": "indirect_beneficiary",
+    "fitAssessment": "string",
+    "revenueExposure": { "pct": "string", "reasoning": "string" },
+    "tailwindStrength": "weak|moderate|strong",
+    "competitivePositionWithinThesis": "pure_play|primary_beneficiary|indirect_beneficiary|tangential",
     "hypothesisScore": null,
-    "verdict": "N/A"
+    "verdict": "string"
   },
 
   "overall": {
     "weightedTotalScore": 7.4,
     "verdict": "strong_buy|buy|watch|avoid",
-    "executiveSummary": "4-5 sentence synthesis"
+    "executiveSummary": "string"
   },
 
   "chartData": {
     "marginTrend": [
-      { "period": "Q1 2023", "grossMargin": 44.1, "operatingMargin": 17.2 }
+      { "period": "string", "grossMargin": 44.1, "operatingMargin": 17.2 }
     ],
     "peerComparison": [
-      { "name": "Peer Co", "ticker": "PC", "evEbitda": 15.2, "forwardPE": 22.0 }
+      { "name": "string", "ticker": "string", "evEbitda": 15.2, "forwardPE": 22.0 }
     ],
     "capitalAllocation": [
-      { "year": "2020", "fcf": 2.1, "buybacks": 0.8, "dividends": 0.3, "capex": 1.2 }
+      { "year": "string", "fcf": 2.1, "buybacks": 0.8, "dividends": 0.3, "capex": 1.2 }
     ]
   },
 
   "recentNews": [
-    { "headline": "string", "summary": "1-2 sentences", "date": "YYYY-MM-DD", "sentiment": "positive|negative|neutral" }
+    { "headline": "string", "summary": "string", "date": "YYYY-MM-DD", "sentiment": "positive|negative|neutral" }
   ]
 }
 
-SCORING RULES:
-${hypothesisContext ? `Hypothesis IS provided — use these weights:
-weightedTotalScore = (quantScore * 0.175) + (qualScore * 0.175) + (businessEconomicsScore * 0.20) + (solvencyScore * 0.10) + (valueScore * 0.20) + (hypothesisScore * 0.15)` : `No hypothesis — use these weights:
-weightedTotalScore = (quantScore * 0.206) + (qualScore * 0.206) + (businessEconomicsScore * 0.235) + (solvencyScore * 0.118) + (valueScore * 0.235)`}
+SCORING WEIGHTS:
+${hypothesisContext
+  ? `quantScore×0.175 + qualScore×0.175 + businessEconomicsScore×0.20 + solvencyScore×0.10 + valueScore×0.20 + hypothesisScore×0.15`
+  : `quantScore×0.206 + qualScore×0.206 + businessEconomicsScore×0.235 + solvencyScore×0.118 + valueScore×0.235`}
+Verdict: >=8.0=strong_buy, >=6.5=buy, >=5.0=watch, <5.0=avoid
 
-Verdict thresholds: >=8.0 = strong_buy, >=6.5 = buy, >=5.0 = watch, <5.0 = avoid
-
-chartData.marginTrend: last 5-6 quarters, grossMargin and operatingMargin as numbers (not strings).
-chartData.peerComparison: 3-4 closest publicly traded peers + the subject company first (different name), evEbitda and forwardPE as numbers.
-chartData.capitalAllocation: last 5 fiscal years, values in billions, numbers only.
-recentNews: 3-5 items with distinct topics from the last 90 days.
-Batch searches where possible to conserve tool calls.${hypothesisNote}`,
+chartData.marginTrend: last 5-6 quarters, margin values as numbers.
+chartData.peerComparison: subject company first + 3-4 peers, evEbitda and forwardPE as numbers.
+chartData.capitalAllocation: last 5 fiscal years, values in billions as numbers.
+recentNews: 3-5 items, distinct topics, last 90 days.${hypothesisNote}`,
       }],
     })
 
     const textBlock = response.content.filter(b => b.type === 'text').at(-1)
     if (!textBlock) throw new Error('No text block in response')
-    return JSON.parse(extractJsonObject(textBlock.text))
+    const raw = extractJsonObject(textBlock.text)
+    try {
+      return JSON.parse(raw)
+    } catch {
+      throw new Error('Response JSON was malformed or truncated — please retry')
+    }
   } catch (err) {
     throw new Error(err.message ?? 'Scorecard analysis failed')
   }
